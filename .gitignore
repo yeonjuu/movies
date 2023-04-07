@@ -1,5 +1,7 @@
 node_modules
-.bulid
+
+/build
+
 .prettierrc
 
 # misc
