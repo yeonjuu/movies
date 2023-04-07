@@ -1,0 +1,29 @@
+@keyframes spin {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.background {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.background img {
+  width: 5%;
+  animation: spin 2s ease-in infinite;
+}
+.background span {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
