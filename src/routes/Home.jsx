@@ -7,9 +7,8 @@ export const Home = () => {
   const [movies, setMovies] = useState([]);
 
   const getMovies = async () => {
-    const res = await fetch(`https://yts.mx/api/v2/list_movies.json?minimum_rating=9.0&sort_by=year`);
+    const res = await fetch(`https://yts.mx/api/v2/list_movies.json?minimum_rating=8.5&sort_by=year`);
     const data = await res.json();
-    console.log(data.data.movies);
     setMovies(data.data.movies);
     setLoading(false);
   };
@@ -22,6 +21,7 @@ export const Home = () => {
     <>
       {loading ? <Loading /> : null}
       <div>
+        <h2>🍿MOVIE INFORMATION🍿</h2>
         {movies.map((movie) => {
           return (
             <Movie
