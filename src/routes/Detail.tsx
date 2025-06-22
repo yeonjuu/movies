@@ -4,10 +4,11 @@ import { Loading } from '../components/Loading';
 import style from './Detail.module.css';
 import Rating from '@mui/material/Rating';
 import StarIcon from '@mui/icons-material/Star';
+import { IMovieDetail } from '../types';
 
 export const Detail = () => {
   const [loading, setLoading] = useState(true);
-  const [movieInfo, setMovieInfo] = useState('');
+  const [movieInfo, setMovieInfo] = useState<IMovieDetail | null>(null);
   const { id } = useParams();
 
   const getMovie = async () => {
@@ -27,29 +28,29 @@ export const Detail = () => {
         <Loading />
       ) : (
         <div className={style.detail}>
-          <h1 className={style.title}>{movieInfo.title}</h1>
+          <h1 className={style.title}>{movieInfo?.title}</h1>
           <div className={style.flex}>
             <img
-              src={movieInfo.medium_cover_image}
-              alt={movieInfo.title}
-              onError={(e) => {
+              src={movieInfo?.medium_cover_image}
+              alt={movieInfo?.title}
+              onError={(e: any) => {
                 e.target.src = './placeholder.png';
               }}
               className="movie-img"
             />
-            <div>{movieInfo.description_full}</div>
+            <div>{movieInfo?.description_full}</div>
           </div>
           <div>
             <h3>INFORMATION</h3>
-            <span>Year {movieInfo.year}</span>
+            <span>Year {movieInfo?.year}</span>
             <br />
-            <span>{movieInfo.like_count} likes</span>
+            <span>{movieInfo?.like_count} likes</span>
             <br />
-            <span>Rate {movieInfo.rating}</span>
+            <span>Rate {movieInfo?.rating}</span>
             <br />
             <Rating
               name="read-only"
-              value={movieInfo.rating / 2}
+              value={movieInfo?.rating || 0}
               precision={0.5}
               emptyIcon={<StarIcon style={{ color: '#ffffff' }} />}
               readOnly
@@ -58,7 +59,7 @@ export const Detail = () => {
           </div>
           <div>Genre</div>
           <ul className={style.genre}>
-            {movieInfo.genres.map((g) => (
+            {movieInfo?.genres.map((g) => (
               <li key={g}>{g}</li>
             ))}
           </ul>

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Loading } from '../components/Loading';
 import { Movie } from '../components/Movie';
+import { IMovie } from '../types';
 
 export const Home = () => {
   const [loading, setLoading] = useState(true);
-  const [movies, setMovies] = useState([]);
+  const [movies, setMovies] = useState<IMovie[]>([]);
 
   const getMovies = async () => {
     const res = await fetch(`https://yts.mx/api/v2/list_movies.json?minimum_rating=8.5&sort_by=year`);
@@ -27,7 +28,7 @@ export const Home = () => {
             <Movie
               key={movie.id}
               id={movie.id}
-              coverImg={movie.medium_cover_image}
+              medium_cover_image={movie.medium_cover_image}
               title={movie.title}
               summary={movie.summary}
               genres={movie.genres}

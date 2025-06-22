@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
+import { IMovie } from '../types';
 
-export const Movie = ({ id, coverImg, title, summary, genres }) => {
-  const handleImage = (e) => {
+export const Movie = ({ id, medium_cover_image: coverImg, title, summary, genres }: IMovie) => {
+  const handleImage = (e: any) => {
     e.target.src = './placeholder.png';
   };
   return (
