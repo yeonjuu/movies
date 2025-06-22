@@ -1,13 +1,21 @@
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { Home } from './routes/Home';
 import { Detail } from './routes/Detail';
+import Header from './components/Header';
+
+// Header 컴포넌트가 없는 경우가 있다면
+// Layout 컴포넌트를 만들어서
+// Header 컴포넌트를 Layout 컴포넌트에 넣고
+// Layout 컴포넌트를 App 컴포넌트에서 사용하도록 변경할 수 있다.
 
 function App() {
   return (
-    <BrowserRouter basename={process.env.PUBLIC_URL}>
+    <BrowserRouter>
+      <Header />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/detail/:id" element={<Detail />} />
+        <Route path="/search" element={null} />
       </Routes>
     </BrowserRouter>
   );
