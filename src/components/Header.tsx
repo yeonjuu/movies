@@ -1,98 +1,8 @@
 import styled from 'styled-components';
 import { motion, useAnimation, useMotionValueEvent, useScroll } from 'framer-motion';
-import { Link, useMatch } from 'react-router-dom';
+import { Link, useMatch, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-
-const Nav = styled(motion.nav)`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: fixed;
-  width: 100%;
-  top: 0;
-  background-color: black;
-  font-size: 14px;
-  padding: 20px 60px;
-  color: white;
-  box-sizing: border-box;
-  z-index: 1000;
-`;
-
-const Logo = styled(motion.svg)`
-  width: 95px;
-  height: 25px;
-  fill: ${(props) => props.theme.red};
-  path {
-    stroke-width: 6px;
-    stroke: transparent;
-  }
-`;
-
-const Col = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const Items = styled.ul`
-  display: flex;
-  align-items: center;
-  gap: 20px;
-`;
-
-const Item = styled.li`
-  color: ${(props) => props.theme.white.darker};
-  transition: color 0.3s ease-in-out;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  &:hover {
-    color: ${(props) => props.theme.white.lighter};
-  }
-  a {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-    color: inherit;
-    text-decoration: none;
-  }
-`;
-
-const Circle = styled(motion.span)`
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  border-radius: 5px;
-  bottom: -8px;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  background-color: ${(props) => props.theme.red};
-`;
-
-const Search = styled.span`
-  color: white;
-  display: flex;
-  align-items: center;
-  position: relative;
-  svg {
-    height: 25px;
-  }
-`;
-
-const Input = styled(motion.input)`
-  transform-origin: right center;
-  position: absolute;
-  right: 0px;
-  padding: 8px 10px;
-  padding-left: 30px;
-  z-index: -1;
-  color: white;
-  font-size: 16px;
-  background-color: transparent;
-  border: 1px solid ${(props) => props.theme.white.lighter};
-`;
+import { useForm } from 'react-hook-form';
 
 const logoVariants = {
   normal: {
@@ -106,6 +16,10 @@ const logoVariants = {
   },
 };
 
+interface IForm {
+  keyword: string;
+}
+
 function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const homeMatch = useMatch('/');
@@ -113,6 +27,15 @@ function Header() {
   const inputAnimation = useAnimation();
   const navAnimation = useAnimation();
   const { scrollY } = useScroll();
+  const { register, handleSubmit } = useForm<IForm>();
+  const navigate = useNavigate();
+
+  const onValid = ({ keyword }: IForm) => {
+    if (keyword === '') return;
+    navigate(`/search?keyword=${keyword}`);
+    setSearchOpen(false);
+    inputAnimation.start('normal');
+  };
 
   const toggleSearch = () => {
     if (searchOpen) {
@@ -162,7 +85,7 @@ function Header() {
         </Items>
       </Col>
       <Col>
-        <Search>
+        <Search onSubmit={handleSubmit(onValid)}>
           <motion.svg
             onClick={toggleSearch}
             transition={{ type: 'tween' }}
@@ -178,6 +101,7 @@ function Header() {
             />
           </motion.svg>
           <Input
+            {...register('keyword', { required: true, minLength: 2 })}
             transition={{ type: 'tween' }}
             animate={{ scaleX: searchOpen ? 1 : 0 }}
             placeholder="Search for movie or tv show..."
@@ -189,3 +113,97 @@ function Header() {
 }
 
 export default Header;
+
+//stylted components가 더 길어지면 heder.styled.ts로 분리
+const Nav = styled(motion.nav)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  background-color: black;
+  font-size: 14px;
+  padding: 20px 60px;
+  color: white;
+  box-sizing: border-box;
+  z-index: 1000;
+  gap: 20px;
+`;
+
+const Logo = styled(motion.svg)`
+  width: 95px;
+  height: 25px;
+  fill: ${(props) => props.theme.red};
+  path {
+    stroke-width: 6px;
+    stroke: transparent;
+  }
+`;
+
+const Col = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+`;
+
+const Items = styled.ul`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+`;
+
+const Item = styled.li`
+  color: ${(props) => props.theme.white.darker};
+  transition: color 0.3s ease-in-out;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  &:hover {
+    color: ${(props) => props.theme.white.lighter};
+  }
+  a {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+`;
+
+const Circle = styled(motion.span)`
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 5px;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  background-color: ${(props) => props.theme.red};
+`;
+
+const Search = styled('form')<React.FormHTMLAttributes<HTMLFormElement>>`
+  color: white;
+  display: flex;
+  align-items: center;
+  position: relative;
+  svg {
+    height: 25px;
+  }
+`;
+
+const Input = styled(motion.input)`
+  transform-origin: right center;
+  position: absolute;
+  right: 0px;
+  padding: 8px 10px;
+  padding-left: 30px;
+  z-index: -1;
+  color: white;
+  font-size: 16px;
+  background-color: transparent;
+  border: 1px solid ${(props) => props.theme.white.lighter};
+`;

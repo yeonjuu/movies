@@ -54,13 +54,14 @@ table {
 }
 body {
   font-family: 'Source Sans Pro', sans-serif;
-  background-color:${(props) => props.theme.white.lighter};
+  background-color: #020202;
   line-height: 1.2;
   font-weight: 300;
+  color: ${(props) => props.theme.white.darker};
 }
 a {
-  text-decoration:none;
-   color: inherit;
+  text-decoration: none;
+  color: inherit;
 }
 svg {
 display: inline-block;
