@@ -1,7 +1,7 @@
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { Home } from './routes/Home';
-import { Detail } from './routes/Detail';
 import Header from './components/Header';
+import { TV } from './routes/TV';
 
 // Header 컴포넌트가 없는 경우가 있다면
 // Layout 컴포넌트를 만들어서
@@ -15,7 +15,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/movies/:movieId" element={<Home />} />
-        <Route path="/detail/:id" element={<Detail />} />
+        <Route path="/tv" element={<TV />} />
+        <Route path="/tv/:tvId" element={<TV />} />
         <Route path="/search" element={null} />
       </Routes>
     </BrowserRouter>
