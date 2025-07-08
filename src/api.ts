@@ -90,24 +90,11 @@ export interface ITvShow {
   poster_path: string;
   vote_average: number;
   vote_count: number;
+  adult: boolean;
 }
 
-export interface ITrendingTvShow {
-  adult: boolean;
-  backdrop_path: string;
-  id: number;
-  name: string;
-  original_language: string;
-  original_name: string;
-  overview: string;
-  poster_path: string;
+export interface ITrendingTvShow extends ITvShow {
   media_type: string;
-  genre_ids: number[];
-  popularity: number;
-  first_air_date: string;
-  vote_average: number;
-  vote_count: number;
-  origin_country: string[];
 }
 
 // 상영중인 영화 응답 타입
@@ -120,7 +107,7 @@ export interface INowPlayingResponse extends IPaginatedResponse<IMovie> {
 
 // 인기 영화 응답 타입
 export type IPopularMovieResponse = IPaginatedResponse<IMovie>;
-export type IPopularTvShowResponse = IPaginatedResponse<ITvShow>;
+export type ITvShowResponse = IPaginatedResponse<ITvShow>;
 export type ITrendingTvShowResponse = IPaginatedResponse<ITrendingTvShow>;
 
 // 영화
@@ -144,12 +131,9 @@ export async function getTopRatedMovies(): Promise<IPopularMovieResponse> {
   return await response.json();
 }
 
-export type AllMovies = {
-  nowPlaying: IMovie[];
-  popular: IMovie[];
-  upcoming: IMovie[];
-  topRated: IMovie[];
-};
+export type MovieCategory = 'nowPlaying' | 'popular' | 'upcoming' | 'topRated';
+
+export type AllMovies = Record<MovieCategory, IMovie[]>;
 
 export async function getAllMovies(): Promise<AllMovies> {
   const [nowPlaying, popular, upcoming, topRated] = await Promise.all([
@@ -176,7 +160,7 @@ export async function getMovieDetails(movieId: number): Promise<IMovieDetails> {
 }
 
 // TV Shows
-export async function getPopularTvShows(): Promise<IPopularTvShowResponse> {
+export async function getPopularTvShows(): Promise<ITvShowResponse> {
   const response = await fetch(`${TV_BASE_URL}/popular?language=${REGION}&page=1`, options);
   return await response.json();
 }
@@ -184,6 +168,42 @@ export async function getPopularTvShows(): Promise<IPopularTvShowResponse> {
 export async function getTrendingTvShows(): Promise<ITrendingTvShowResponse> {
   const response = await fetch(`${BASE_URL}/trending/tv/day?language=${REGION}`, options);
   return await response.json();
+}
+
+//tv/airing_today?language=en-US&page=1';
+export async function getAiringTodayTvShows(): Promise<ITvShowResponse> {
+  const response = await fetch(`${TV_BASE_URL}/airing_today?language=${REGION}&page=1`, options);
+  return await response.json();
+}
+
+///tv/top_rated?language=en-US&page=1';
+export async function getTopRatedTvShows(): Promise<ITvShowResponse> {
+  const response = await fetch(`${TV_BASE_URL}/top_rated?language=${REGION}&page=1`, options);
+  return await response.json();
+}
+
+export type ContentCategory = 'popular' | 'trending' | 'airingToday' | 'topRated';
+
+export type AllTvShows = Record<ContentCategory, ITvShow[]>;
+
+export async function getAllTvShows(): Promise<AllTvShows> {
+  const [popular, trending, airingToday, topRated] = await Promise.all([
+    getPopularTvShows(),
+    getTrendingTvShows(),
+    getAiringTodayTvShows(),
+    getTopRatedTvShows(),
+  ]);
+
+  if (!popular.results || !trending.results || !airingToday.results || !topRated.results) {
+    throw new Error('Failed to fetch TV shows');
+  }
+
+  return {
+    popular: popular.results,
+    trending: trending.results,
+    airingToday: airingToday.results,
+    topRated: topRated.results,
+  };
 }
 
 interface IGenre {
