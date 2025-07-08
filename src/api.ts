@@ -42,6 +42,40 @@ export interface IMovie {
   vote_count: number;
 }
 
+export interface IProductionCompany {
+  id: number;
+  logo_path: string | null;
+  name: string;
+  origin_country: string;
+}
+
+export interface IProductionCountry {
+  iso_3166_1: string;
+  name: string;
+}
+
+export interface ISpokenLanguage {
+  english_name: string;
+  iso_639_1: string;
+  name: string;
+}
+
+export interface IMovieDetails extends IMovie {
+  belongs_to_collection: null | object;
+  budget: number;
+  genres: IGenre[];
+  homepage: string;
+  imdb_id: string;
+  origin_country: string[];
+  production_companies: IProductionCompany[];
+  production_countries: IProductionCountry[];
+  revenue: number;
+  runtime: number;
+  spoken_languages: ISpokenLanguage[];
+  status: string;
+  tagline: string;
+}
+
 export interface ITvShow {
   backdrop_path: string;
   first_air_date: string;
@@ -89,6 +123,7 @@ export type IPopularMovieResponse = IPaginatedResponse<IMovie>;
 export type IPopularTvShowResponse = IPaginatedResponse<ITvShow>;
 export type ITrendingTvShowResponse = IPaginatedResponse<ITrendingTvShow>;
 
+// 영화
 export async function getMovies(): Promise<INowPlayingResponse> {
   const response = await fetch(`${MOVIE_BASE_URL}/now_playing?language=${REGION}&page=1`, options);
   return await response.json();
@@ -99,11 +134,48 @@ export async function getPopularMovies(): Promise<IPopularMovieResponse> {
   return await response.json();
 }
 
-export async function getUpcomingMovies(): Promise<IPaginatedResponse<IMovie>> {
+export async function getUpcomingMovies(): Promise<INowPlayingResponse> {
   const response = await fetch(`${MOVIE_BASE_URL}/upcoming?language=${REGION}&page=1`, options);
   return await response.json();
 }
 
+export async function getTopRatedMovies(): Promise<IPopularMovieResponse> {
+  const response = await fetch(`${MOVIE_BASE_URL}/top_rated?language=${REGION}&page=1`, options);
+  return await response.json();
+}
+
+export type AllMovies = {
+  nowPlaying: IMovie[];
+  popular: IMovie[];
+  upcoming: IMovie[];
+  topRated: IMovie[];
+};
+
+export async function getAllMovies(): Promise<AllMovies> {
+  const [nowPlaying, popular, upcoming, topRated] = await Promise.all([
+    getMovies(),
+    getPopularMovies(),
+    getUpcomingMovies(),
+    getTopRatedMovies(),
+  ]);
+
+  return {
+    nowPlaying: nowPlaying.results,
+    popular: popular.results,
+    upcoming: upcoming.results,
+    topRated: topRated.results,
+  };
+}
+
+export async function getMovieDetails(movieId: number): Promise<IMovieDetails> {
+  const response = await fetch(`${MOVIE_BASE_URL}/${movieId}?language=${REGION}`, options);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch movie details for ID ${movieId}`);
+  }
+  return await response.json();
+}
+
+// TV Shows
 export async function getPopularTvShows(): Promise<IPopularTvShowResponse> {
   const response = await fetch(`${TV_BASE_URL}/popular?language=${REGION}&page=1`, options);
   return await response.json();
@@ -112,31 +184,6 @@ export async function getPopularTvShows(): Promise<IPopularTvShowResponse> {
 export async function getTrendingTvShows(): Promise<ITrendingTvShowResponse> {
   const response = await fetch(`${BASE_URL}/trending/tv/day?language=${REGION}`, options);
   return await response.json();
-}
-
-// popular movies, tv shows, and trending tv shows get all data at once without pagination
-export async function getAll(): Promise<{
-  movies: IMovie[];
-  tvShows: ITvShow[];
-  trendingTvShows: ITrendingTvShow[];
-}> {
-  try {
-    const [moviesRes, tvRes, trendingRes]: [IPopularMovieResponse, IPopularTvShowResponse, ITrendingTvShowResponse] =
-      await Promise.all([getPopularMovies(), getPopularTvShows(), getTrendingTvShows()]);
-
-    if (!moviesRes.results || !tvRes.results || !trendingRes.results) {
-      throw new Error('One or more API responses are invalid');
-    }
-
-    return {
-      movies: moviesRes.results,
-      tvShows: tvRes.results,
-      trendingTvShows: trendingRes.results,
-    };
-  } catch (err) {
-    console.error('Failed to fetch all data:', err);
-    throw err;
-  }
 }
 
 interface IGenre {
