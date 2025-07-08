@@ -137,7 +137,7 @@ export const ContentSlider = ({ data, onBoxClicked, haveRanking }: IMovieProps) 
                     onClick={() => onBoxClicked(movie.id)}
                   >
                     <Info variants={infoVariants}>
-                      <h4>{'title' in movie ? movie.title : movie?.name}</h4>
+                      <h4>{'title' in movie ? movie.title : movie?.original_name}</h4>
                     </Info>
                   </Box>
                 </Poster>
