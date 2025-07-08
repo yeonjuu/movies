@@ -27,7 +27,10 @@ export function ContentModal({ clickedMovie }: ContentModalProps) {
   return (
     <>
       <Overlay onClick={onOverlayClick} exit={{ opacity: 0 }} animate={{ opacity: 1 }} />
-      <DetailMovie style={{ top: scrollY.get() + 100 }} layoutId={moviePathMatch.params.movieId}>
+      <DetailMovie
+        style={{ top: scrollY.get() + 100 }}
+        layoutId={moviePathMatch.params.movieId ? `modal-${moviePathMatch.params.movieId}` : undefined}
+      >
         {clickedMovie && (
           <>
             <BigCover
