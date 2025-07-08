@@ -6,11 +6,12 @@ import { getGenres, IMovie, ITrendingTvShow, ITvShow } from '../api';
 import { useQuery } from 'react-query';
 
 interface ContentModalProps {
-  clickedMovie: IMovie | ITvShow | ITrendingTvShow | null;
+  clicked: IMovie | ITvShow | ITrendingTvShow | null;
 }
 
-export function ContentModal({ clickedMovie }: ContentModalProps) {
+export function ContentModal({ clicked }: ContentModalProps) {
   const moviePathMatch = useMatch('/movies/:movieId');
+  const tvPathMatch = useMatch('/tv/:tvId');
   const { scrollY } = useScroll();
   const navigate = useNavigate();
   const { data: genres, isLoading } = useQuery('genres', getGenres);
@@ -22,32 +23,31 @@ export function ContentModal({ clickedMovie }: ContentModalProps) {
     return ids.map((id) => genres.find((genre) => genre.id === id));
   };
 
-  if (!moviePathMatch || !clickedMovie) return null;
+  if (!moviePathMatch && !tvPathMatch) return null;
+
+  const id = moviePathMatch?.params.movieId ?? tvPathMatch?.params.tvId;
 
   return (
     <>
       <Overlay onClick={onOverlayClick} exit={{ opacity: 0 }} animate={{ opacity: 1 }} />
-      <DetailMovie
-        style={{ top: scrollY.get() + 100 }}
-        layoutId={moviePathMatch.params.movieId ? `modal-${moviePathMatch.params.movieId}` : undefined}
-      >
-        {clickedMovie && (
+      <DetailMovie style={{ top: scrollY.get() + 100 }} layoutId={id ? `modal-${id}` : undefined}>
+        {clicked && (
           <>
             <BigCover
               style={{
                 backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                  clickedMovie.backdrop_path,
+                  clicked.backdrop_path,
                   'w500',
                 )})`,
               }}
             />
-            <BigTitle> {'title' in clickedMovie ? clickedMovie.title : clickedMovie?.name}</BigTitle>
+            <BigTitle> {'title' in clicked ? clicked.title : clicked?.name}</BigTitle>
             <BigGenres>
-              {findGenres(clickedMovie.genre_ids)
+              {findGenres(clicked.genre_ids)
                 .map((g) => g?.name)
                 .join(' | ')}
             </BigGenres>
-            <BigOverview>{clickedMovie?.overview}</BigOverview>
+            <BigOverview>{clicked?.overview}</BigOverview>
           </>
         )}
       </DetailMovie>
@@ -62,6 +62,7 @@ const Overlay = styled(motion.div)`
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   opacity: 0;
+  z-index: 100;
 `;
 
 const DetailMovie = styled(motion.div)`
@@ -73,6 +74,7 @@ const DetailMovie = styled(motion.div)`
   margin: 0 auto;
   border-radius: 15px;
   overflow: hidden;
+  z-index: 100;
   background-color: ${(props) => props.theme.black.veryDark};
 `;
 
